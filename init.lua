@@ -134,6 +134,12 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 			if  #newplayer.keywords == 0 or (not newplayer.assigned_keywords[name]) or string.lower(fields.keyword) == string.lower(newplayer.assigned_keywords[name]) then
 				local privs = minetest.get_player_privs(name)
 				privs.interact = true
+				local extraprivs = minetest.settings:get("newplayer.extra_privs")
+				if extraprivs then
+					for i in string.gmatch(extraprivs,"%S+") do
+						privs[i] = true
+					end
+				end
 				minetest.set_player_privs(name,privs)
 				if newplayer.hudids[name] then
 					minetest.get_player_by_name(name):hud_remove(newplayer.hudids[name])
