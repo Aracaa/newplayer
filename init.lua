@@ -228,7 +228,9 @@ minetest.register_chatcommand("set_no_interact_spawn",{
 	description = "Set the spawn point for players without interact to your current position",
 	privs = {server=true},
 	func = function(name)
-		local pos = minetest.get_player_by_name(name):getpos()
+		local player = minetest.get_player_by_name(name)
+		if not player then return end
+		local pos = player:get_pos()
 		minetest.setting_set("spawnpoint_no_interact",string.format("%s,%s,%s",pos.x,pos.y,pos.z))
 		minetest.setting_save()
 		return true, newplayer.colorize("#55FF55","Success: ").."Spawn point for players without interact set to: "..newplayer.colorize("#00FFFF",minetest.pos_to_string(pos))
@@ -240,7 +242,9 @@ minetest.register_chatcommand("set_interact_spawn",{
 	description = "Set the spawn point for players with interact to your current position",
 	privs = {server=true},
 	func = function(name)
-		local pos = minetest.get_player_by_name(name):getpos()
+		local player = minetest.get_player_by_name(name)
+		if not player then return end
+		local pos = player:get_pos()
 		minetest.setting_set("spawnpoint_interact",string.format("%s,%s,%s",pos.x,pos.y,pos.z))
 		minetest.setting_save()
 		return true, newplayer.colorize("#55FF55","Success: ").."Spawn point for players with interact set to: "..newplayer.colorize("#00FFFF",minetest.pos_to_string(pos))
@@ -302,12 +306,13 @@ minetest.register_chatcommand("spawn",{
 	params = "",
 	description = "Teleport to the spawn",
 	func = function(name)
-		local hasinteract = minetest.check_player_privs(name,{interact=true})
 		local player = minetest.get_player_by_name(name)
+		if not player then return end
+		local hasinteract = minetest.check_player_privs(name,{interact=true})
 		if hasinteract then
 			local pos = minetest.setting_get_pos("spawnpoint_interact")
 			if pos then
-				player:setpos(pos)
+				player:set_pos(pos)
 				return true, "Teleporting to spawn..."
 			else
 				return true, newplayer.colorize("#FF0000","ERROR: ").."The spawn point is not set!"
@@ -315,7 +320,7 @@ minetest.register_chatcommand("spawn",{
 		else
 			local pos = minetest.setting_get_pos("spawnpoint_no_interact")
 			if pos then
-				player:setpos(pos)
+				player:set_pos(pos)
 				return true, "Teleporting to spawn..."
 			else
 				return true, newplayer.colorize("#FF0000","ERROR: ").."The spawn point is not set!"
