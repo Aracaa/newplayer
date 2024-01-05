@@ -308,6 +308,7 @@ minetest.register_chatcommand("delkeyword",{
 minetest.register_chatcommand("spawn",{
 	params = "",
 	description = S("Teleport to the spawn"),
+	privs = {teleport=true},
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
 		if not player then return end
