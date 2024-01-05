@@ -1,5 +1,8 @@
 newplayer = {}
 
+local S = minetest.get_translator("newplayer")
+
+
 if type(minetest.colorize) == "function" then
 	newplayer.colorize = minetest.colorize
 else
@@ -27,7 +30,7 @@ if f then
 	newplayer.rules = minetest.formspec_escape(d)
 	f:close()
 else
-	newplayer.rules = "Rules file not found!\n\nThe file should be named \"newplayer-rules.txt\" and placed in the following location:\n\n"..minetest.get_worldpath()..DIR_DELIM
+	newplayer.rules = S("Rules file not found!\n\nThe file should be named \"newplayer-rules.txt\" and placed in the following location:\n\n @1", minetest.get_worldpath() .. DIR_DELIM)
 end
 
 function newplayer.savekeywords()
@@ -38,12 +41,12 @@ function newplayer.savekeywords()
 end
 
 local editformspec1 = "size[13,9]"..
-	"label[0,-0.1;Editing Server Rules]"..
+	"label[0,-0.1;" .. S("Editing Server Rules") .. "]"..
 	"textarea[0.25,0.5;12.5,7;rules;;"
 -- the rules get inserted between these two on demand
 local editformspec2 = "]"..
-	"button_exit[0.5,8.1;2,1;save;Save]"..
-	"button_exit[5,8.1;2,1;quit;Cancel]"
+	"button_exit[0.5,8.1;2,1;save;" .. S("Save") .."]"..
+	"button_exit[5,8.1;2,1;quit;" .. S("Cancel") .."]"
 
 function newplayer.showrulesform(name)
 
@@ -82,23 +85,23 @@ function newplayer.showrulesform(name)
 		newplayer.rules_subbed_interact = newplayer.rules_formspec_buffer
 	end		
 	local form_interact = "size[13,9]"..
-				"label[0,-0.1;Server Rules]"..
+				"label[0,-0.1;" .. S("Server Rules") .."]"..
 				"textlist[0.25,0.5;12.5,6.25;rules;"..newplayer.rules_subbed_interact.."]"
 	local form_nointeract = "size[13,9]"..
-				"label[0,-0.1;Server Rules]"..
+				"label[0,-0.1;" .. S("Server Rules") .."]"..
 				"textlist[0.25,0.5;12.5,6.25;rules;"..newplayer.rules_subbed.."]"..
-				"button[1,8;2,1;yes;I agree]"..
-				"button[5,8;2,1;no;I do not agree]"
+				"button[1,8;2,1;yes;" .. S("I agree") .."]"..
+				"button[5,8;2,1;no;" .. S("I do not agree") .."]"
 	if #newplayer.keywords > 0 then
 		form_nointeract = form_nointeract.."field[0.5,7.6;8,1;keyword;Enter keyword from rules above:;]"
 	end
 	local hasinteract = minetest.check_player_privs(name,{interact=true})
 	if hasinteract then
 		if minetest.check_player_privs(name,{server=true}) then
-			form_interact = form_interact.."button_exit[0.4,8.1;2,1;quit;OK]"
-			form_interact = form_interact.."button[4,8.1;2,1;edit;Edit]"
+			form_interact = form_interact.."button_exit[0.4,8.1;2,1;quit;" .. S("OK") .."]"
+			form_interact = form_interact.."button[4,8.1;2,1;edit;" .. S("Edit") .."]"
 		else
-			form_interact = form_interact.."button_exit[0.4,8.1;2,1;quit;OK]"
+			form_interact = form_interact.."button_exit[0.4,8.1;2,1;quit;" .. S("OK") .."]"
 		end
 		minetest.show_formspec(name,"newplayer:rules_interact",form_interact)
 	else
@@ -119,7 +122,7 @@ minetest.register_on_joinplayer(function(player)
 		hud_elem_type = "text",
 		position = {x=0.5,y=0.5},
 		scale = {x=100,y=100},
-		text = "BUILDING DISABLED\nYou must agree to\nthe rules before building!\nUse the /rules command\nto see them.",
+		text = S("BUILDING DISABLED\nYou must agree to\nthe rules before building!\nUse the /rules command\nto see them."),
 		number = 0xFF6666,
 		alignment = {x=0,y=0},
 		offset = {x=0,y=0}
@@ -148,30 +151,30 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 				end
 				local spawn = minetest.setting_get_pos("spawnpoint_interact")
 				if spawn then
-					minetest.chat_send_player(name,"Teleporting to spawn...")
+					minetest.chat_send_player(name,S("Teleporting to spawn..."))
 					player:setpos(spawn)
 				else
-					minetest.chat_send_player(name,newplayer.colorize("#FF0000","ERROR: ").."The spawn point is not set!")
+					minetest.chat_send_player(name,newplayer.colorize("#FF0000","ERROR: ")..S("The spawn point is not set!"))
 				end
 				local form =    "size[5,3]"..
-						"label[1,0;Thank you for agreeing]"..
-						"label[1,0.5;to the rules!]"..
-						"label[1,1;You are now free to play normally.]"..
-						"label[1,1.5;You can also use /spawn to return here.]"..
-						"button_exit[1.5,2;2,1;quit;OK]"
+						"label[1,0;" .. S("Thank you for agreeing") .. "]"..
+						"label[1,0.5;" .. S("to the rules!") .. "]"..
+						"label[1,1;" .. S("You are now free to play normally.") .. "]"..
+						"label[1,1.5;" .. S("You can also use /spawn to return here.") .. "]"..
+						"button_exit[1.5,2;2,1;quit;" .. S("OK") .. "]"
 				minetest.show_formspec(name,"newplayer:agreethanks",form)
 			else
 				local form =    "size[5,3]"..
-						"label[1,0;Incorrect keyword!]"..
-						"button[1.5,2;2,1;quit;Try Again]"
+						"label[1,0;" .. S("Incorrect keyword!") .. "]"..
+						"button[1.5,2;2,1;quit;" .. S("Try Again") .. "]"
 				minetest.show_formspec(name,"newplayer:tryagain",form)
 			end
 		elseif fields.no then
 			local form =    "size[5,3]"..
-					"label[1,0;You may remain on the server,]"..
-					"label[1,0.5;but you may not dig or build]"..
-					"label[1,1;until you agree to the rules.]"..
-					"button_exit[1.5,2;2,1;quit;OK]"
+					"label[1,0;" .. S("You may remain on the server,") .. "]"..
+					"label[1,0.5;" .. S("but you may not dig or build") .. "]"..
+					"label[1,1;" .. S("until you agree to the rules.") .. "]"..
+					"button_exit[1.5,2;2,1;quit;" .. S("OK") .. "]"
 			minetest.show_formspec(name,"newplayer:disagreewarning",form)
 		end
 		return true
@@ -185,10 +188,10 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 				f:write(fields.rules)
 				f:close()
 				newplayer.rules = minetest.formspec_escape(fields.rules)
-				minetest.chat_send_player(name,newplayer.colorize("#55FF55","Success: ").."Rules/keyword updated.")
+				minetest.chat_send_player(name,newplayer.colorize("#55FF55","Success: ")..S("Rules/keyword updated."))
 			end
 		else
-			minetest.chat_send_player(name,"You hacker you... nice try!")
+			minetest.chat_send_player(name,S("You hacker you... nice try!"))
 		end
 	elseif formname == "newplayer:rules_interact" then
 		if fields.edit and minetest.check_player_privs(name,{server=true}) then
@@ -208,14 +211,14 @@ end)
 
 minetest.register_chatcommand("rules",{
 	params = "",
-	description = "View the rules",
+	description = S("View the rules"),
 	func = newplayer.showrulesform
 	}
 )
 
 minetest.register_chatcommand("editrules",{
 	params = "",
-	description = "Edit the rules",
+	description = S("Edit the rules"),
 	privs = {server=true},
 	func = function(name)
 		minetest.show_formspec(name,"newplayer:editrules",editformspec1..newplayer.rules..editformspec2)
@@ -225,7 +228,7 @@ minetest.register_chatcommand("editrules",{
 
 minetest.register_chatcommand("set_no_interact_spawn",{
 	params = "",
-	description = "Set the spawn point for players without interact to your current position",
+	description = S("Set the spawn point for players without interact to your current position"),
 	privs = {server=true},
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
@@ -233,13 +236,13 @@ minetest.register_chatcommand("set_no_interact_spawn",{
 		local pos = player:get_pos()
 		minetest.setting_set("spawnpoint_no_interact",string.format("%s,%s,%s",pos.x,pos.y,pos.z))
 		minetest.setting_save()
-		return true, newplayer.colorize("#55FF55","Success: ").."Spawn point for players without interact set to: "..newplayer.colorize("#00FFFF",minetest.pos_to_string(pos))
+		return true, newplayer.colorize("#55FF55",S("Success: "))..S("Spawn point for players without interact set to: ")..newplayer.colorize("#00FFFF",minetest.pos_to_string(pos))
 	end}
 )
 
 minetest.register_chatcommand("set_interact_spawn",{
 	params = "",
-	description = "Set the spawn point for players with interact to your current position",
+	description = S("Set the spawn point for players with interact to your current position"),
 	privs = {server=true},
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
@@ -247,23 +250,23 @@ minetest.register_chatcommand("set_interact_spawn",{
 		local pos = player:get_pos()
 		minetest.setting_set("spawnpoint_interact",string.format("%s,%s,%s",pos.x,pos.y,pos.z))
 		minetest.setting_save()
-		return true, newplayer.colorize("#55FF55","Success: ").."Spawn point for players with interact set to: "..newplayer.colorize("#00FFFF",minetest.pos_to_string(pos))
+		return true, newplayer.colorize("#55FF55",S("Success: "))..S("Spawn point for players with interact set to: ")..newplayer.colorize("#00FFFF",minetest.pos_to_string(pos))
 	end}
 )
 
 minetest.register_chatcommand("getkeywords",{
 	params = "",
-	description = "Gets the list of keywords used to obtain the interact privilege",
+	description = S("Gets the list of keywords used to obtain the interact privilege"),
 	privs = {server=true},
 	func = function(name)
 		local out = ""
 		if #newplayer.keywords > 0 then
-			out = "Currently configured keywords:"
+			out = S("Currently configured keywords:")
 			for _,kw in pairs(newplayer.keywords) do
 				out = out.."\n"..newplayer.colorize("#00FFFF",kw)
 			end
 		else
-			out = "No keywords are currently set."
+			out = S("No keywords are currently set.")
 		end
 		return true, out
 	end}
@@ -271,11 +274,11 @@ minetest.register_chatcommand("getkeywords",{
 
 minetest.register_chatcommand("addkeyword",{
 	params = "<keyword>",
-	description = "Add a keyword to the list of keywords used to obtain the interact privilege",
+	description = S("Add a keyword to the list of keywords used to obtain the interact privilege"),
 	privs = {server=true},
 	func = function(name,param)
 		if (not param) or param == "" then
-			return true, newplayer.colorize("#FF0000","ERROR: ").."No keyword supplied"
+			return true, newplayer.colorize("#FF0000","ERROR: ")..S("No keyword supplied")
 		end
 		table.insert(newplayer.keywords,param)
 		newplayer.savekeywords()
@@ -285,26 +288,26 @@ minetest.register_chatcommand("addkeyword",{
 
 minetest.register_chatcommand("delkeyword",{
 	params = "<keyword>",
-	description = "Remove a keyword from the list of keywords used to obtain the interact privilege",
+	description = S("Remove a keyword from the list of keywords used to obtain the interact privilege"),
 	privs = {server=true},
 	func = function(name,param)
 		if (not param) or param == "" then
-			return true, newplayer.colorize("#FF0000","ERROR: ").."No keyword supplied"
+			return true, newplayer.colorize("#FF0000","ERROR: ")..S("No keyword supplied")
 		end
 		for k,v in pairs(newplayer.keywords) do
 			if v == param then
 				newplayer.keywords[k] = nil
 				newplayer.savekeywords()
-				return true, "Keyword "..newplayer.colorize("#00FFFF",param).." removed"
+				return true, S("Keyword @1 removed",newplayer.colorize("#00FFFF",param))
 			end
 		end
-		return true, newplayer.colorize("#FF0000","ERROR: ").."Keyword "..newplayer.colorize("#00FFFF",param).." not found"
+		return true, newplayer.colorize("#FF0000",S("ERROR: "))..S("Keyword @1 not found",newplayer.colorize("#00FFFF",param))
 	end}
 )
 
 minetest.register_chatcommand("spawn",{
 	params = "",
-	description = "Teleport to the spawn",
+	description = S("Teleport to the spawn"),
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
 		if not player then return end
@@ -313,17 +316,17 @@ minetest.register_chatcommand("spawn",{
 			local pos = minetest.setting_get_pos("spawnpoint_interact")
 			if pos then
 				player:set_pos(pos)
-				return true, "Teleporting to spawn..."
+				return true, S("Teleporting to spawn...")
 			else
-				return true, newplayer.colorize("#FF0000","ERROR: ").."The spawn point is not set!"
+				return true, newplayer.colorize("#FF0000",S("ERROR: "))..S("The spawn point is not set!")
 			end
 		else
 			local pos = minetest.setting_get_pos("spawnpoint_no_interact")
 			if pos then
 				player:set_pos(pos)
-				return true, "Teleporting to spawn..."
+				return true, S("Teleporting to spawn...")
 			else
-				return true, newplayer.colorize("#FF0000","ERROR: ").."The spawn point is not set!"
+				return true, newplayer.colorize("#FF0000",S("ERROR: "))..S("The spawn point is not set!")
 			end
 		end
 	end}
@@ -337,11 +340,11 @@ minetest.register_on_chat_message(function(name, message)
 		newplayer.showrulesform(name)
 	elseif message:lower():find("help") then
 		local fs =      "size[5,3]"..
-				"label[0,0;In order to build,]"..
-				"label[0,0.5;you must read and agree to the rules.]"..
-				"label[0,1;View them now?]"..
-				"button[0,2;2,1;yes;Yes]"..
-				"button_exit[3,2;2,1;quit;No]"
+				"label[0,0;" .. S("In order to build,") .."]"..
+				"label[0,0.5;" .. S("you must read and agree to the rules.") .."]"..
+				"label[0,1;" .. S("View them now?") .."]"..
+				"button[0,2;2,1;yes;" .. S("Yes") .."]"..
+				"button_exit[3,2;2,1;quit;" .. S("No") .."]"
 		minetest.show_formspec(name,"newplayer:help",fs)
 	end
 end)
