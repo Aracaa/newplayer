@@ -159,9 +159,12 @@ minetest.register_on_player_receive_fields(function(player,formname,fields)
 				local form =    "size[5,3]"..
 						"label[1,0;" .. S("Thank you for agreeing") .. "]"..
 						"label[1,0.5;" .. S("to the rules!") .. "]"..
-						"label[1,1;" .. S("You are now free to play normally.") .. "]"..
-						"label[1,1.5;" .. S("You can also use /spawn to return here.") .. "]"..
-						"button_exit[1.5,2;2,1;quit;" .. S("OK") .. "]"
+						"label[1,1;" .. S("You are now free to play normally.") .. "]"
+				if minetest.check_player_privs(name,"teleport") then
+					form = form .. "label[1,1.5;" .. S("You can also use /spawn to return here.") .. "]"
+				end
+				form = form .. "button_exit[1.5,2;2,1;quit;" .. S("OK") .. "]"
+				
 				minetest.show_formspec(name,"newplayer:agreethanks",form)
 			else
 				local form =    "size[5,3]"..
